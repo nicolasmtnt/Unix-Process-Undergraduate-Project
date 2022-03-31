@@ -36,9 +36,10 @@ sleep(3);
 printf("$$Connexion au serveur %s reussie$$\n", scenario[0]);
 
 int pipeServ_Ach[2];
+int pipeAch_Serv[2];
 char buf;
-char* msg = "Veuillez saisir votre nom: ";
 
+if(pipe(pipeAch_Serv) < 0 ) report_and_exit("pipeAch_Serv");
 if(pipe(pipeServ_Ach) < 0) report_and_exit("pipeServ_Ach");
 pid_t cpid = fork();
 if(cpid < 0) report_and_exit("fork");
@@ -46,13 +47,20 @@ if(cpid < 0) report_and_exit("fork");
 if(0 == cpid) { /* child  */
     close(pipeServ_Ach[WriteEnd]);
     while(read(pipeServ_Ach[ReadEnd], &buf, 1) > 0) write(STDOUT_FILENO, &buf, sizeof(buf));
-    close(pipeServ_Ach[ReadEnd]);
+    sleep(4);
+    close(pipeAch_Serv[ReadEnd]);
+    write(pipeAch_Serv[WriteEnd], scenario[1], strlen(scenario[1]));
+    close(pipeAch_Serv[WriteEnd]);
     _exit(0);
 } else { /*parent*/
+    char* msg_1 = "Veuillez saisir votre nom: ";
     close(pipeServ_Ach[ReadEnd]);
-    write(pipeServ_Ach[WriteEnd], msg, strlen(msg));
+    write(pipeServ_Ach[WriteEnd], msg_1, strlen(msg_1));
     close(pipeServ_Ach[WriteEnd]);
     wait(NULL);
+    close(pipeAch_Serv[WriteEnd]);
+    while(read(pipeAch_Serv[ReadEnd], &buf, 1) > 0) write(STDOUT_FILENO, &buf, sizeof(buf));
+    close(pipeAch_Serv[ReadEnd]);
     exit(0);
 }
 return(0);
