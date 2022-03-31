@@ -3,38 +3,41 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define N 2 // number of processes (N processes equivalent to N-1 fork)
 
+char processes[][20] = {"sw1","sw2","Antoine","Francoise","Jule","Anne"};
+const int N = sizeof(processes)/sizeof(processes[0]); // N = 6
+
+
+// Les prototypes
 void error(const char *msg);
 int sumArray(int array[],int n);
 void printArray(int array[], int n);
-int arraysEquals(int array1[],int array2[],int n);
 int isProcess(char str[],int pid[]);
 
-int sw1[] = {1,0};
-int sw2[] = {0,0};
-
-
 int main(void){
-
-    // int fd[N][2];
-    // for(int i=0; i<N; i++)
-    //     if(pipe(fd[i]) < 0)
-    //         error("An error occured during pipes creation");
     
-    int pid[N-1] = {0};
-    for(int i=0; i<N-1; i++){
-        if(sumArray(pid,N-1)==0){
-            pid[i] = fork();
-        }
+    int pid[N] = {0};
+    int fd[N][2]; // Instanciation des files directories
+    for(int i=0; i<N; i++){
+        if(pipe(fd[i]) < 0) // Creation des pipes
+            error("An error occured during pipes creation");
+        if(sumArray(pid,N-1)==0)
+            pid[i] = fork(); // creation des processus
     }
+    
+    // verification  avec des examples ci dessous
+    if(isProcess("Anne", pid)){ 
+        printf("Hello c'est le proccess Anne qui vous parle \n");
+    }
+
+    printArray(pid,N);
 
     return 0;
 }
 
 
 
-void error(const char *msg) {
+void error(const char *msg){
   perror(msg);
   exit (-1);
 }
@@ -52,10 +55,10 @@ void printArray(int array[], int n){
     printf("\n");
 }
 
-int isProcess(char str[],int pid[]){ // ne fonctionne pas
-    if(pid[0] != 0 && strcmp("sw1",str)){
-        printf("hello");
-        return 1;
-    }
+
+int isProcess(char str[],int pid[]){
+    for(int i = 0; i<N; i++)
+        if(pid[i] != 0 && strcmp(processes[i],str)==0)
+            return 1;
     return 0;
 }
