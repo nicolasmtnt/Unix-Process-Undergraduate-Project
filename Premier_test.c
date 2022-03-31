@@ -1,7 +1,5 @@
 /******************************************************************************
-
 Essai de projet SE.
-
 *******************************************************************************/
 #include <sys/wait.h>		/* wait */
 #include <stdio.h>
@@ -23,36 +21,46 @@ void report_and_exit (const char *msg) {
   exit (-1);   /** failure **/
 }
 
-int main () {
-  printf("Bonjour, bienvenue au service de vente de palettes de parpaings!\n");
-  fflush(stdout);
-  sleep(2);
-  printf("$$Connexion au serveur en cours... veuillez patienter$$\n");
-  fflush(stdout);
-  sleep(3);
-  printf("$$Connexion au serveur %s reussie$$\n", scenario[0]);
-  fflush(stdout);
+int
+main ()
+{
+printf("Bonjour %s, bienvenue au service de vente de palettes de parpaings!\n", scenario[1]);
+sleep(2);
+printf("$$Connexion au serveur en cours... veuillez patienter$$\n");
+sleep(3);
+printf("$$Connexion au serveur %s reussie$$\n", scenario[0]);
 
-  int pipeServ_Ach[2];
-  char buf;
-  char* msg = "Veuillez saisir votre nom: ";
+int pipeServ_Ach[2];
+int pipeAch_Serv[2];
+char buf;
 
-  if(pipe(pipeServ_Ach) < 0)
-    report_and_exit("pipeServ_Ach");
-  pid_t cpid = fork();
-  if(cpid < 0) 
-    report_and_exit("fork");
+if(pipe(pipeAch_Serv) < 0 ) report_and_exit("pipeAch_Serv");
+if(pipe(pipeServ_Ach) < 0) report_and_exit("pipeServ_Ach");
+pid_t cpid_1 = fork();
+if(cpid_1< 0) report_and_exit("fork");
 
-  if(0 == cpid) { /* child  */
-      close(pipeServ_Ach[WriteEnd]);
-      while(read(pipeServ_Ach[ReadEnd], &buf, 1) > 0) 
-        write(STDOUT_FILENO, &buf, sizeof(buf));
-      close(pipeServ_Ach[ReadEnd]);
-  } else { /*parent*/
-      close(pipeServ_Ach[ReadEnd]);
-      write(pipeServ_Ach[WriteEnd], msg, strlen(msg));
-      close(pipeServ_Ach[WriteEnd]);
-      wait(NULL);
-  }
-  return 0;
+if(0 == cpid_1) { /*child*/
+    char concat_str[100];
+    close(pipeServ_Ach[WriteEnd]);
+    read(pipeServ_Ach[ReadEnd], concat_str, 100);
+    printf("%s", concat_str);
+    close(pipeServ_Ach[ReadEnd]);
+    close(pipeAch_Serv[ReadEnd]);
+    write(pipeAch_Serv[WriteEnd], scenario[3], strlen(scenario[3]) + 1);
+    close(pipeAch_Serv[WriteEnd]);
+} else { /*parent*/
+    char concat_str[100];
+    char* msg_1 = "Veuillez selectionner un type de parpaing : ";
+    close(pipeServ_Ach[ReadEnd]);
+    write(pipeServ_Ach[WriteEnd], msg_1, strlen(msg_1) + 1);
+    close(pipeServ_Ach[WriteEnd]);
+    wait(NULL);
+    close(pipeAch_Serv[WriteEnd]);
+    read(pipeAch_Serv[ReadEnd], concat_str, 100);
+    sleep(3);
+    printf("%s \n", concat_str);
+    close(pipeAch_Serv[ReadEnd]);
+}
+
+return(0);
 }
