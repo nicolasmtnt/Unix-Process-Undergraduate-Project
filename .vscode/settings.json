@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.csv": "css",
+        "sstream": "c"
+    }
+}
