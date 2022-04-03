@@ -16,9 +16,12 @@ void printArray(int array[], int n);
 int isProcess(Process id,int pid[]);
 void setPipes(Process id, int fd[N*(N-1)][2]);
 void closePipes(Process id, int fd[N*(N-1)][2]);
+void writeStringR(int fd[],char str[]);
 
 void writeString(int fd[],char str[]);
 void readString(int fd[],char str[]);
+
+
 
 
 int main(void){
@@ -26,7 +29,7 @@ int main(void){
     int pid[N] = {0};
     int fd[2*N*(N-1)][2]; // Instanciation des files directories
 
-    for(int i = 0; i< N*(N-1);i++){ // Creation des pipes
+    for(int i = 0; i< 2*N*(N-1);i++){ // Creation des pipes
         if(pipe(fd[i]) < 0) 
             error("An error occured during pipes creation");
     }
@@ -61,6 +64,7 @@ int main(void){
         char str[200];
         readString(fd[0],str);
         printf("%s",str);
+
 // ------
 
         closePipes(Antoine,fd);
@@ -117,7 +121,7 @@ int isProcess(Process id,int pid[]){
     return 0;
 }
 
-void setPipes(Process id, int fd[N*(N-1)][2]){
+void setPipes(Process id, int fd[2*N*(N-1)][2]){
     int min = 6*id;
     int max = 6*id + 6;
     for(int i = 0; i<min; i++)
@@ -126,9 +130,19 @@ void setPipes(Process id, int fd[N*(N-1)][2]){
         close(fd[i][1]);
     for(int i = min; i< max;i++)
         close(fd[i][0]);
+    
+
+    int rmin = min + (N)*(N-1);
+    int rmax = max + (N)*(N-1);
+    for(int i = N*(N-1); i<rmin; i++)
+        close(fd[i][0]);
+    for(int i = rmax; i<2*N*(N-1);i++)
+        close(fd[i][0]);
+    for(int i = rmin; i< rmax;i++)
+        close(fd[i][1]);
 }
 
-void closePipes(Process id, int fd[N*(N-1)][2]){
+void closePipes(Process id, int fd[2*N*(N-1)][2]){
     int min = 6*id;
     int max = 6*id + 6;
     for(int i = 0; i<min; i++)
@@ -137,19 +151,28 @@ void closePipes(Process id, int fd[N*(N-1)][2]){
         close(fd[i][0]);
     for(int i = min; i< max;i++)
         close(fd[i][1]);
+    
+    int rmin = min + (N)*(N-1);
+    int rmax = max + (N)*(N-1);
+    for(int i = N*(N-1); i<rmin; i++)
+        close(fd[i][1]);
+    for(int i = rmax; i<2*N*(N-1);i++)
+        close(fd[i][1]);
+    for(int i = min; i< max;i++)
+        close(fd[i][0]);
+    
 }
 
 
 void writeString(int fd[],char str[]){
-
     int n = strlen(str)+1;
     write(fd[1],&n,sizeof(int));
     write(fd[1],str,sizeof(char)*n);
 }
 
 void readString(int fd[],char str[]){
-
     int n;
     read(fd[0],&n,sizeof(int));
     read(fd[0],str,sizeof(char)*n);
 }
+
