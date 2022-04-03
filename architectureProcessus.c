@@ -24,7 +24,7 @@ void readString(int fd[],char str[]);
 int main(void){
     
     int pid[N] = {0};
-    int fd[N*(N-1)][2]; // Instanciation des files directories
+    int fd[2*N*(N-1)][2]; // Instanciation des files directories
 
     for(int i = 0; i< N*(N-1);i++){ // Creation des pipes
         if(pipe(fd[i]) < 0) 
@@ -40,12 +40,7 @@ int main(void){
         setPipes(sw1,fd);
 
 //-----
-
-        char *str;
-        int n;
-        readString(fd[0],str);
-        printf("Message envoyé à sw1 par Antoine : %s\n",str);
-
+        writeString(fd[0],"hello");
 //------
         closePipes(sw1,fd);
     }
@@ -62,8 +57,10 @@ int main(void){
         setPipes(Antoine,fd);
 
 // ------
-
-        writeString(fd[0],"Hello");
+        int n;
+        char str[200];
+        readString(fd[0],str);
+        printf("%s",str);
 // ------
 
         closePipes(Antoine,fd);
@@ -145,7 +142,7 @@ void closePipes(Process id, int fd[N*(N-1)][2]){
 
 void writeString(int fd[],char str[]){
 
-    int n = strlen(str) +1;
+    int n = strlen(str)+1;
     write(fd[1],&n,sizeof(int));
     write(fd[1],str,sizeof(char)*n);
 }
