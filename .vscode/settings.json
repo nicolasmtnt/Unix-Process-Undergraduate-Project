@@ -1,6 +1,25 @@
 {
     "files.associations": {
         "*.csv": "css",
-        "sstream": "c"
+        "sstream": "c",
+        "istream": "c",
+        "ratio": "c",
+        "__hash_table": "c",
+        "__tuple": "c",
+        "array": "c",
+        "chrono": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "type_traits": "c",
+        "limits": "c",
+        "tuple": "c",
+        "variant": "c",
+        "__functional_base": "c",
+        "__functional_base_03": "c",
+        "algorithm": "c",
+        "functional": "c",
+        "iterator": "c",
+        "memory": "c",
+        "utility": "c"
     }
 }
