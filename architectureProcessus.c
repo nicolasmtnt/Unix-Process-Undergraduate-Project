@@ -244,7 +244,7 @@ float requestAvailableArea(Process from, Process to,int fd[N*N][2],char type[]){
 }
 
 void requestQuantityAndPrice(Process from, Process to,int fd[N*N][2],char type[], float area, int *quantity,float *price){
-    fprintf(stderr,"%s : Je demande à %s combien de palettes de type %s est-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
+    fprintf(stderr,"%s : Je demande à %s combien de palettes de type %s ei-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
     char str1[20] = "2,";
     char str2[20];
     char str3[20];
@@ -288,7 +288,7 @@ void requestDelivery(Process from, Process to, int fd[N*N][2], char type[], int 
 }
 
 void requestSignature(Process from, Process to, int fd[N*N][2], char type[], int quantity){
-    fprintf(stderr,"%s : Je demande à %s de signer un des deux bon de livraison.\n",getName(from),getName(to));
+    fprintf(stderr,"%s : Je demande à %s de signer un des deux bons de livraison.\n",getName(from),getName(to));
     fflush(stdout);
     char deliveryNote1[20];
     sprintf(deliveryNote1,"5,%s,%d,unsigned",type,quantity);
