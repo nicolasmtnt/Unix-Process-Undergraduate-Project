@@ -1,4 +1,4 @@
-// Illustration pour mieux comprendre le code à cette adresse : hhttps://github.com/nicolasmtnt/Unix-Process-Undergraduate-Project/blob/main/README.md
+// Illustration pour mieux comprendre le code à cette adresse : https://github.com/nicolasmtnt/Unix-Process-Undergraduate-Project/blob/main/README.md
 
 #include <stdio.h>
 #include <string.h>
