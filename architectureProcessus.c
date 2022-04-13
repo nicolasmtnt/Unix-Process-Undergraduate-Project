@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <math.h>
 
-// Illustration pour mieux comprendre le code à cette adresse : https://github.com/nicolasmtnt/Unix-Process-Undergraduate-Project
+// Illustration pour mieux comprendre le code à cette adresse : hhttps://github.com/nicolasmtnt/Unix-Process-Undergraduate-Project/blob/main/README.md
 
 #define N 6 // nombre de process / acteur
 
@@ -232,24 +232,26 @@ int findAdress(Process from, Process to){
 }
 
 float requestAvailableArea(Process from, Process to,int fd[N*N][2],char type[]){
-    fprintf(stderr,"%s : Je demande à %s combien de palette de type %s sont disponible.\n",getName(from),getName(to),type);
+    fprintf(stderr,"%s : Je demande à %s combien de palette de type [%s] sont disponible.\n",getName(from),getName(to),type);
     char str[20] = "1,";
     strcat(str,type);
     fflush(stdout);
     writeString(fd[findAdress(from,to)],str);
+    usleep(500000);
     readString(fd[findAdress(to,from)],str);
-    fprintf(stderr,"%s : %s me repond que la surface disponible de palette de type %s est de %s m^2.\n\n",getName(from),getName(to),type,str);
+    fprintf(stderr,"%s : %s me repond que la surface disponible de palette de type [%s] est de %s m^2.\n\n",getName(from),getName(to),type,str);
     fflush(stdout);
     return atof(str);
 }
 
 void requestQuantityAndPrice(Process from, Process to,int fd[N*N][2],char type[], float area, int *quantity,float *price){
-    fprintf(stderr,"%s : Je demande à %s combien de palettes de type %s est-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
+    fprintf(stderr,"%s : Je demande à %s combien de palettes de type [%s] ai-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
     char str1[20] = "2,";
     char str2[20];
     char str3[20];
     sprintf(str1, "2,%s,%.2f", type,area);
     writeString(fd[findAdress(from,to)],str1);
+    usleep(500000);
     readString(fd[findAdress(to,from)],str2);
     readString(fd[findAdress(to,from)],str3);
     fprintf(stderr,"%s : %s me repond qu'il me faudra acheter %s palettes aux prix de %s€\n\n",getName(from),getName(to),str2,str3);
@@ -260,25 +262,27 @@ void requestQuantityAndPrice(Process from, Process to,int fd[N*N][2],char type[]
 }
 
 void requestPayment(Process from, Process to,int fd[N*N][2],char type[], int quantity, char cardNumber[16],short crypto){
-    fprintf(stderr,"%s : J'achète (par le serveur %s) %d palettes de type %s.\n - Numero Carte de Paiement : %s\n - Cryptogramme : %d\n",getName(from),getName(to),quantity,type,cardNumber,crypto);
+    fprintf(stderr,"%s : J'achète (par le serveur %s) %d palettes de type [%s].\n - Numero Carte de Paiement : %s\n - Cryptogramme : %d\n",getName(from),getName(to),quantity,type,cardNumber,crypto);
     fflush(stdout);
     char str1[40];
     char str2[20];
     char str3[20];
     sprintf(str1,"3,%s,%d,%s,%hd",type,quantity,cardNumber,crypto);
     writeString(fd[findAdress(from,to)],str1);
+    usleep(500000);
     readString(fd[findAdress(to,from)],str2);
     if(strcmp(str2,"1")==0){
         readString(fd[findAdress(to,from)],str3);
-        fprintf(stderr,"%s : Succès du paiement de %d palettes de type %s pour %s€.\n\n",getName(from),quantity,type,str3);
+        fprintf(stderr,"%s : Succès du paiement de %d palettes de type [%s] pour %s€.\n\n",getName(from),quantity,type,str3);
         fflush(stdout);
     } else {
-        fprintf(stderr,"Echec du paiement de %d palettes de type %s.\n\n",quantity,type);
+        fprintf(stderr,"Echec du paiement de %d palettes de type [%s].\n\n",quantity,type);
     }
 }
 
 void requestDelivery(Process from, Process to, int fd[N*N][2], char type[], int quantity,Process client){
-    fprintf(stderr,"%s : Je demande à %s de livrer un colis de %d palettes de type %s à %s.\n",getName(from),getName(to),quantity,type,getName(client));
+    usleep(500000);
+    fprintf(stderr,"%s : Je demande à %s de livrer un colis de %d palettes de type [%s] à %s.\n",getName(from),getName(to),quantity,type,getName(client));
     fflush(stdout);
     char request[20];
     char response[20];
@@ -288,13 +292,15 @@ void requestDelivery(Process from, Process to, int fd[N*N][2], char type[], int 
 }
 
 void requestSignature(Process from, Process to, int fd[N*N][2], char type[], int quantity){
-    fprintf(stderr,"%s : Je demande à %s de signer un des deux bon de livraison.\n",getName(from),getName(to));
+    sleep(1);
+    fprintf(stderr,"%s : Je demande à %s de signer un des deux bons de livraison.\n",getName(from),getName(to));
     fflush(stdout);
     char deliveryNote1[20];
     sprintf(deliveryNote1,"5,%s,%d,unsigned",type,quantity);
     char deliveryNote2[20];
     strcpy(deliveryNote2,deliveryNote1);
     writeString(fd[findAdress(from,to)],deliveryNote2);
+    usleep(50000);
     readString(fd[findAdress(to,from)],deliveryNote2);
 
     fprintf(stderr,"%s : %s m'a rendu le bon de livraison signé.\n\n",getName(from),getName(to));
