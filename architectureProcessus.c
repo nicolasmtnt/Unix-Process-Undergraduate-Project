@@ -1,12 +1,21 @@
+// Illustration pour mieux comprendre le code à cette adresse : hhttps://github.com/nicolasmtnt/Unix-Process-Undergraduate-Project/blob/main/README.md
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
 
-// Illustration pour mieux comprendre le code à cette adresse : hhttps://github.com/nicolasmtnt/Unix-Process-Undergraduate-Project/blob/main/README.md
+#define N 6 // nombre de process ( 2 clients + 2 serveurs + 2 livreurs)
+#define TYPE "plein" // valeurs possibles : "plein" , "creux"
+#define AREA 40 // valeurs possibles :  float positif
+#define NOMBRE_PALETTES 20 //valeurs possibles : entier positifs
+#define CLIENT Antoine // valeurs possibles : Antoine,  Francoise
+#define SERVEUR sw1 // valeurs possibles : sw1 , sw2
+#define LIVREUR Jule // valeurs possibles : Jule , Anne
 
-#define N 6 // nombre de process / acteur
+
+
 
 float PaletteSize = 50*0.2*0.2;
 float palettePleinPrice = 5.99;
@@ -21,11 +30,11 @@ typedef enum {
 } bool;
 
 char cardNumberRegistry[2][20] = {
-    "5412751234123456","4000123456789010"
+    "5412751234123456","4000123456789010" // Numero de carte bleu de Antoine et de Francoise
 };
 
 char cardCryptoRegistry[2][20] = {
-    "274","947"
+    "274","947" // crytpogramme de la carte bleu de Antoine et de Francoise
 };
 
 float surfaceDispoCreux = 100;
@@ -75,52 +84,54 @@ int main(void){
     
     //  ------------ LES PROCESS ------------
 
-    if(isProcess(sw1, pid)){ 
+    if(isProcess(sw1, pid) && SERVEUR == sw1){ 
         setPipes(sw1,fd);
-        //printf("Hello c'est le proccess sw1 qui vous parle \n");
+        
 
-        detectQuery(fd,Antoine,sw1); //reception de requestQuantityAndPrice() de Antoine
-        detectQuery(fd,Antoine,sw1); //reception de requestPayment() de Antoine
-        requestDelivery(sw1, Jule, fd, "plein",20, Antoine); //affectation de la livraison à Jule
+        detectQuery(fd,CLIENT,SERVEUR); //reception de requestQuantityAndPrice() de CLIENT
+        detectQuery(fd,CLIENT,SERVEUR); //reception de requestPayment() de CLIENT
+        requestDelivery(SERVEUR, LIVREUR, fd, TYPE,NOMBRE_PALETTES, CLIENT); //affectation de la livraison à LIVREUR
         closePipes(sw1,fd);
     }
 
-    if(isProcess(sw2, pid)){ 
+    if(isProcess(sw2, pid) && SERVEUR == sw2){ 
         setPipes(sw2,fd);
-        //printf("Hello c'est le proccess sw2 qui vous parle \n");
+        detectQuery(fd,CLIENT,SERVEUR); //reception de requestQuantityAndPrice() de CLIENT
+        detectQuery(fd,CLIENT,SERVEUR); //reception de requestPayment() de CLIENT
+        requestDelivery(SERVEUR, LIVREUR, fd, TYPE,NOMBRE_PALETTES, CLIENT); //affectation de la livraison à LIVREUR
         closePipes(sw2,fd);
     }
 
-    if(isProcess(Antoine, pid)){ 
+    if(isProcess(Antoine, pid) && CLIENT == Antoine){ 
         setPipes(Antoine,fd);
-        //printf("Hello c'est le proccess Antoine qui vous parle \n");
         int quantity;
         float price;
-        requestQuantityAndPrice(Antoine, sw1, fd,"plein", 40,  &quantity, &price); 
-        requestPayment(Antoine,sw1,fd,"plein",quantity,"5412751234123456",274); //Achat
-        detectQuery(fd,Jule,Antoine); // reception de la livraison
-        closePipes(Antoine,fd);
+        requestQuantityAndPrice(CLIENT, SERVEUR, fd,TYPE, AREA,  &quantity, &price); // CLIENT demande a SERVEUR quels est le prix et la quantité pour une certaines surface
+        requestPayment(CLIENT,SERVEUR,fd,TYPE,quantity,"5412751234123456",274); //Achat
+        detectQuery(fd,LIVREUR,CLIENT); // reception de la livraison
+        closePipes(CLIENT,fd);
     }
 
-    if(isProcess(Francoise, pid)){ 
+    if(isProcess(Francoise, pid) && CLIENT == Francoise){ 
         setPipes(Francoise,fd);
-
+        int quantity;
+        float price;
+        requestQuantityAndPrice(CLIENT, SERVEUR, fd,TYPE, AREA,  &quantity, &price); // CLIENT demande a SERVEUR quels est le prix et la quantité pour une certaines surface
+        requestPayment(CLIENT,SERVEUR,fd,TYPE,quantity,"5412751234123456",274); //Achat
+        detectQuery(fd,LIVREUR,CLIENT); // reception de la livraison
         closePipes(Francoise,fd);
     }
 
-    if(isProcess(Jule, pid)){ 
+    if(isProcess(Jule, pid) && LIVREUR == Jule){ 
         setPipes(Jule,fd);
 
-        //printf("Hello c'est le proccess Jule qui vous parle \n");
-        detectQuery(fd,sw1,Jule);
+        detectQuery(fd,SERVEUR,LIVREUR);
         closePipes(Jule,fd);
     }
 
-    if(isProcess(Anne, pid)){ 
+    if(isProcess(Anne, pid) && LIVREUR == Anne){ 
         setPipes(Anne,fd);
-
-        //printf("Hello c'est le proccess Anne qui vous parle \n");
-
+        detectQuery(fd,SERVEUR,LIVREUR);
         closePipes(Anne,fd);
     }
     return 0;
