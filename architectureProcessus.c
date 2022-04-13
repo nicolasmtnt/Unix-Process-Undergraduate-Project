@@ -245,7 +245,11 @@ float requestAvailableArea(Process from, Process to,int fd[N*N][2],char type[]){
 }
 
 void requestQuantityAndPrice(Process from, Process to,int fd[N*N][2],char type[], float area, int *quantity,float *price){
+<<<<<<< HEAD
     fprintf(stderr,"%s : Je demande à %s combien de palettes de type [%s] ai-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
+=======
+    fprintf(stderr,"%s : Je demande à %s combien de palettes de type %s ei-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
+>>>>>>> 61a6acc2d5dcbce971d236299f3c5ac7e56176f4
     char str1[20] = "2,";
     char str2[20];
     char str3[20];
