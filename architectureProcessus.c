@@ -12,8 +12,6 @@ float PaletteSize = 50*0.2*0.2;
 float palettePleinPrice = 5.99;
 float paletteCreuxPrice = 4.99;
 
-
-
 typedef enum {
     sw1, sw2, Antoine, Francoise, Jule, Anne
 } Process;
@@ -78,64 +76,55 @@ int main(void){
     //  ------------ LES PROCESS ------------
 
     if(isProcess(sw1, pid)){ 
+        setPipes(sw1,fd);
         //printf("Hello c'est le proccess sw1 qui vous parle \n");
 
         detectQuery(fd,Antoine,sw1); //reception de requestQuantityAndPrice() de Antoine
-
         detectQuery(fd,Antoine,sw1); //reception de requestPayment() de Antoine
         requestDelivery(sw1, Jule, fd, "plein",20, Antoine); //affectation de la livraison à Jule
-        
         closePipes(sw1,fd);
     }
 
     if(isProcess(sw2, pid)){ 
-
+        setPipes(sw2,fd);
         //printf("Hello c'est le proccess sw2 qui vous parle \n");
         closePipes(sw2,fd);
-
     }
 
     if(isProcess(Antoine, pid)){ 
+        setPipes(Antoine,fd);
         //printf("Hello c'est le proccess Antoine qui vous parle \n");
-        
         int quantity;
         float price;
         requestQuantityAndPrice(Antoine, sw1, fd,"plein", 40,  &quantity, &price); 
         requestPayment(Antoine,sw1,fd,"plein",quantity,"5412751234123456",274); //Achat
-
         detectQuery(fd,Jule,Antoine); // reception de la livraison
-
-
         closePipes(Antoine,fd);
-
     }
 
     if(isProcess(Francoise, pid)){ 
- 
-        
-        closePipes(Francoise,fd);
+        setPipes(Francoise,fd);
 
+        closePipes(Francoise,fd);
     }
 
     if(isProcess(Jule, pid)){ 
-        //printf("Hello c'est le proccess Jule qui vous parle \n");
-        
-        detectQuery(fd,sw1,Jule);
+        setPipes(Jule,fd);
 
+        //printf("Hello c'est le proccess Jule qui vous parle \n");
+        detectQuery(fd,sw1,Jule);
         closePipes(Jule,fd);
     }
 
     if(isProcess(Anne, pid)){ 
+        setPipes(Anne,fd);
+
         //printf("Hello c'est le proccess Anne qui vous parle \n");
 
         closePipes(Anne,fd);
     }
     return 0;
 }
-
-
-
-
 
 void error(const char *msg){
   perror(msg);
@@ -245,11 +234,7 @@ float requestAvailableArea(Process from, Process to,int fd[N*N][2],char type[]){
 }
 
 void requestQuantityAndPrice(Process from, Process to,int fd[N*N][2],char type[], float area, int *quantity,float *price){
-<<<<<<< HEAD
     fprintf(stderr,"%s : Je demande à %s combien de palettes de type [%s] ai-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
-=======
-    fprintf(stderr,"%s : Je demande à %s combien de palettes de type %s ei-je besoin pour une surface de %.2f m^2 et combien cela me coutera\n",getName(from),getName(to),type,area);
->>>>>>> 61a6acc2d5dcbce971d236299f3c5ac7e56176f4
     char str1[20] = "2,";
     char str2[20];
     char str3[20];
@@ -262,7 +247,6 @@ void requestQuantityAndPrice(Process from, Process to,int fd[N*N][2],char type[]
     fflush(stdout);
     *quantity = atoi(str2);
     *price = atof(str3);
-
 }
 
 void requestPayment(Process from, Process to,int fd[N*N][2],char type[], int quantity, char cardNumber[16],short crypto){
@@ -292,7 +276,6 @@ void requestDelivery(Process from, Process to, int fd[N*N][2], char type[], int 
     char response[20];
     sprintf(request,"4,%d,%s,%d",client,type,quantity);
     writeString(fd[findAdress(from,to)],request);
-    
 }
 
 void requestSignature(Process from, Process to, int fd[N*N][2], char type[], int quantity){
@@ -415,7 +398,6 @@ void respondDelivery(char content[],int fd[2*N*N][2],Process from, Process to){
     char *type = strtok(NULL,",");
     int quantity = atoi(strtok(NULL,","));
     requestSignature(to,client,fd,type,quantity);
-
 }
 
 void respondSignature(char content[],int fd[2*N*N][2],Process from, Process to){
@@ -424,5 +406,4 @@ void respondSignature(char content[],int fd[2*N*N][2],Process from, Process to){
     char signedDeliveryNote[20];
     sprintf(signedDeliveryNote,"5,%s,%d,signed",type,quantity);
     writeString(fd[findAdress(to,from)],signedDeliveryNote);
-
 }
