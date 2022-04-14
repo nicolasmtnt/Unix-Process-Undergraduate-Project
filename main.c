@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+
 //Veuillez remplacer les valeurs pour le scénario de votre choix
 #define N 6 // nombre de process ( 2 clients + 2 serveurs + 2 livreurs)
 #define TYPE "plein" // valeurs possibles : "plein" , "creux"
@@ -14,33 +15,20 @@
 #define SERVEUR sw1 // valeurs possibles : sw1 , sw2
 #define LIVREUR Jule // valeurs possibles : Jule , Anne
 
-
-
-
 float PaletteSize = 50*0.2*0.2;
 float palettePleinPrice = 5.99;
 float paletteCreuxPrice = 4.99;
 
-typedef enum {
-    sw1, sw2, Antoine, Francoise, Jule, Anne
-} Process;
+typedef enum { sw1, sw2, Antoine, Francoise, Jule, Anne } Process;
+typedef enum { false,true } bool;
 
-typedef enum {
-    false,true
-} bool;
-
-char cardNumberRegistry[2][20] = {
-    "5412751234123456","4000123456789010" // Numero de carte bleu de Antoine et de Francoise
-};
-
-char cardCryptoRegistry[2][20] = {
-    "274","947" // crytpogramme de la carte bleu de Antoine et de Francoise
-};
-
+char cardNumberRegistry[2][20] = {"5412751234123456","4000123456789010" };// Numero de carte bleu de Antoine et de Francoise;
+char cardCryptoRegistry[2][20] = {"274","947"}; // crytpogramme de la carte bleu de Antoine et de Francoise
 float surfaceDispoCreux = 100;
 float surfaceDispoPlein = 200;
 
 // Les prototypes
+
 void error(const char *msg);
 int sumArray(int array[],int n);
 void printArray(int array[], int n);
@@ -86,8 +74,6 @@ int main(void){
 
     if(isProcess(sw1, pid) && SERVEUR == sw1){ 
         setPipes(sw1,fd);
-        
-
         detectQuery(fd,CLIENT,SERVEUR); //reception de requestQuantityAndPrice() de CLIENT
         detectQuery(fd,CLIENT,SERVEUR); //reception de requestPayment() de CLIENT
         requestDelivery(SERVEUR, LIVREUR, fd, TYPE,NOMBRE_PALETTES, CLIENT); //affectation de la livraison à LIVREUR
@@ -155,7 +141,6 @@ void printArray(int array[], int n){
     printf("\n");
 }
 
-
 int isProcess(Process id,int pid[]){
     for(int i = 0; i<N; i++)
         if(pid[i] != 0 && id ==i)
@@ -173,7 +158,6 @@ void setPipes(Process id, int fd[2*N*N][2]){
     for(int i = min; i< max;i++)
         close(fd[i][0]);
     
-
     int rmin = min + (N)*N;
     int rmax = max + (N)*N;
     for(int i = N*N; i<rmin; i++)
@@ -230,6 +214,8 @@ int findAdress(Process from, Process to){
     else
         return N*N+6*from+to;
 }
+
+// ------- Process Request -------
 
 float requestAvailableArea(Process from, Process to,int fd[N*N][2],char type[]){
     fprintf(stderr,"%s : Je demande à %s combien de palettes de type [%s] sont disponibles.\n",getName(from),getName(to),type);
@@ -300,13 +286,12 @@ void requestSignature(Process from, Process to, int fd[N*N][2], char type[], int
     writeString(fd[findAdress(from,to)],deliveryNote2);
     usleep(50000);
     readString(fd[findAdress(to,from)],deliveryNote2);
-
     fprintf(stderr,"%s : %s m'a rendu le bon de livraison signé.\n\n",getName(from),getName(to));
     fflush(stdout);
 }
 
-
 // ------- Responss of Process -------
+
 void processRequest(char str[], int fd[2*N*N][2], Process from, Process to){
     int index = atoi(strtok (str,","));
     char *content = strtok(NULL,"");
@@ -359,7 +344,6 @@ void respondAvailableArea(char content[],int fd[2*N*N][2],Process from, Process 
 void respondPaletSize(char content[],int fd[2*N*N][2],Process from, Process to){
     char *type = strtok (content,",");
     char *area = strtok(NULL,"");
-
     char response1[20];
     char response2[20];
     int quantity = SurfacetoQuantity(atof(area));
@@ -387,23 +371,19 @@ void respondPayment(char content[],int fd[2*N*N][2],Process from, Process to){
     int quantity = atoi(strtok(NULL,","));
     char *cardNumber = strtok(NULL,",");
     char *crypto = strtok(NULL,"");
-
     float price;
     if(strcmp(type,"creux")==0)
         price = paletteCreuxPrice*quantity;
     if(strcmp(type,"plein")==0)
         price = palettePleinPrice*quantity;
-    
     char strprice[20];
     sprintf(strprice, "%.2f", price);
-
     if((strcmp(cardNumber,cardNumberRegistry[from-2])==0) && (strcmp(crypto,cardCryptoRegistry[from-2])==0)){
         writeString(fd[findAdress(to,from)],"1");
         writeString(fd[findAdress(to,from)],strprice);
     }
 }
 
-//4,2,"creux","12"
 void respondDelivery(char content[],int fd[2*N*N][2],Process from, Process to){
     Process client = atoi(strtok(content,","));
     char *type = strtok(NULL,",");
