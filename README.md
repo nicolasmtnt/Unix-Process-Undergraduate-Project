@@ -17,8 +17,8 @@ Jule : Je demande à Antoine de signer un des deux bons de livraison.
 Jule : Antoine m'a rendu le bon de livraison signé.
 ```
 
-Il arrive que [Online GDB](https://www.onlinegdb.com/online_c_compiler) ne retourne parfois pas tous les prints ci dessus (pour des raisons que nous n'avons pas réussi à determiner).
+Il arrive que [Online GDB](https://www.onlinegdb.com/online_c_compiler) ne retourne parfois pas tous les printf ci dessus,souvent les deux derniers (pour des raisons que nous n'avons pas réussi à determiner).
 
-Si nécessaire, les autres compilateurs en ligne comme [Programiz](https://www.programiz.com/c-programming/online-compiler/) fonctionnent parfaitement avec un comportement plus proche de nos machines.
+Si besoin, les autres compilateurs en ligne comme [Programiz](https://www.programiz.com/c-programming/online-compiler/) fonctionnent parfaitement avec un comportement plus proche de nos machines.
 
 ![Network Architecture](tableOfComunication.png)
